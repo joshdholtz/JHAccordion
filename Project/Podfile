@@ -1,0 +1,7 @@
+pod "JHAccordion", :path => "../JHAccordion.podspec"
+
+target "Demo" do
+end
+
+target "DemoTests" do
+end
