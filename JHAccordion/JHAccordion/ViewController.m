@@ -26,6 +26,7 @@
 	// Do any additional setup after loading the view, typically from a nib.
     
     _accordion = [[JHAccordion alloc] initWithTableView:_tblAccordion];
+    [_accordion setAllowOnlyOneOpenSection:YES];
     [_accordion setDelegate:self];
 }
 
@@ -78,7 +79,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return (indexPath.section == _accordion.selectedSection ? 44.0f : 0.0f);
+    return ( [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f);
 }
 
 #pragma mark - JHAccordionDelegate

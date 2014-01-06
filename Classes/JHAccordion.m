@@ -17,7 +17,7 @@
 - (id)init {
     self = self = [super init];
     if (self) {
-        self.selectedSection = -1;
+        self.selectedSections = [NSMutableArray array];
     }
     return self;
 }
@@ -30,26 +30,44 @@
     return self;
 }
 
-- (void)setSelectedSection:(NSInteger)selectedSection {
-    NSInteger previouslyOpenedSection = _selectedSection;
+- (void)openSection:(NSInteger)selectedSection {
+    BOOL isPreviouslyOpened = [self isSectionOpened:selectedSection];
+    NSArray *previouslyOpenedSections = [_selectedSections copy];
+
+    if (isPreviouslyOpened == NO) {
+        if (_allowOnlyOneOpenSection == YES) {
+            [_selectedSections removeAllObjects];
+        }
+        
+        [_selectedSections addObject:[NSNumber numberWithInteger:selectedSection]];
+    } else {
+        [_selectedSections removeObject:[NSNumber numberWithInteger:selectedSection]];
+    }
     
-    NSInteger section = selectedSection;
-    if (_selectedSection == section) section = -1;
-    
-    _selectedSection = section;
     [_tableView beginUpdates];
     [_tableView endUpdates];
     
-    if (previouslyOpenedSection != -1 && [_delegate respondsToSelector:@selector(accordionClosedSection:)]) {
-        [_delegate accordionClosedSection:previouslyOpenedSection];
+    if ([_delegate respondsToSelector:@selector(accordionClosedSection:)]) {
+        if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
+            [_delegate accordionClosedSection:selectedSection];
+        } else if (_allowOnlyOneOpenSection == YES) {
+            for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
+                [_delegate accordionClosedSection:previouslyOpenedSection.integerValue];
+            }
+        }
     }
-    if (_selectedSection != -1 && [_delegate respondsToSelector:@selector(accordionOpenedSection:)]) {
-        [_delegate accordionOpenedSection:_selectedSection];
+    
+    if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordionOpenedSection:)]) {
+        [_delegate accordionOpenedSection:selectedSection];
     }
 }
 
+- (BOOL)isSectionOpened:(NSInteger)section {
+    return [_selectedSections containsObject:[NSNumber numberWithInteger:section]];
+}
+
 - (void)onClickSection:(UIView*)sender {
-    [self setSelectedSection:sender.tag];
+    [self openSection:sender.tag];
 }
 
 @end

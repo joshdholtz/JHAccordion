@@ -13,11 +13,16 @@
 @interface JHAccordion : NSObject
 
 @property (nonatomic, strong) UITableView *tableView;
-@property (nonatomic, assign) NSInteger selectedSection;
+@property (nonatomic, strong) NSMutableArray *selectedSections;
 
+@property (nonatomic, assign) BOOL allowOnlyOneOpenSection;
 @property (nonatomic, assign) id<JHAccordionDelegate> delegate;
 
 - (id)initWithTableView:(UITableView*)tableView;
+
+- (void)openSection:(NSInteger)section;
+- (BOOL)isSectionOpened:(NSInteger)section;
+
 - (void)onClickSection:(UIView*)sender;
 
 @end
