@@ -21,6 +21,8 @@
 - (id)initWithTableView:(UITableView*)tableView;
 
 - (void)openSection:(NSInteger)section;
+- (void)closeSection:(NSInteger)section;
+- (void)toggleSection:(NSInteger)section;
 - (BOOL)isSectionOpened:(NSInteger)section;
 
 - (void)onClickSection:(UIView*)sender;

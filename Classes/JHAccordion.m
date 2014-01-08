@@ -30,7 +30,19 @@
     return self;
 }
 
-- (void)openSection:(NSInteger)selectedSection {
+- (void)openSection:(NSInteger)section {
+    if (![self isSectionOpened:section]) {
+        [self toggleSection:section];
+    }
+}
+
+- (void)closeSection:(NSInteger)section {
+    if ([self isSectionOpened:section]) {
+        [self toggleSection:section];
+    }
+}
+
+- (void)toggleSection:(NSInteger)selectedSection {
     BOOL isPreviouslyOpened = [self isSectionOpened:selectedSection];
     NSArray *previouslyOpenedSections = [_selectedSections copy];
 
@@ -67,7 +79,7 @@
 }
 
 - (void)onClickSection:(UIView*)sender {
-    [self openSection:sender.tag];
+    [self toggleSection:sender.tag];
 }
 
 @end
