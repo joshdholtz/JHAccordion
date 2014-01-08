@@ -6,6 +6,7 @@ Created helper for managing opend and closed sections in an accodion style table
 
 - Handles click event for section header views
 - Manages opened and closed sections
+- Configure to only allow one section open at a time or multiple
 - Optional delegate to listen when sections open and close (so you can do cool animation thingies)
 
 ## Installation
@@ -18,7 +19,7 @@ Clone the repository and drop in the .h and .m files from the "Classes" director
 JSONAPI is available through [CocoaPods](http://cocoapods.org), to install
 it simply add the following line to your Podfile:
 
-    pod 'JHSidebar', :git => 'git@github.com:joshdholtz/JHAccordion.git'
+    pod 'JHAccordion', :git => 'git@github.com:joshdholtz/JHAccordion.git'
 
 ## Examples
 
@@ -34,6 +35,7 @@ To see full example click here: [ViewController.m](https://github.com/joshdholtz
     
     // Initializes JHAccodion with table and sets delegate
     _accordion = [[JHAccordion alloc] initWithTableView:_tblAccordion];
+    [_accordion setAllowOnlyOneOpenSection:YES];
     [_accordion setDelegate:self];
 }
 
@@ -65,7 +67,7 @@ To see full example click here: [ViewController.m](https://github.com/joshdholtz
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     // This sets all rows in the closed sections to a height of 0 (so they won't be shown)
     // and the opened section to a height of 44.0
-    return (indexPath.section == _accordion.selectedSection ? 44.0f : 0.0f);
+    return ( [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f);
 }
 
 #pragma mark - JHAccordionDelegate
