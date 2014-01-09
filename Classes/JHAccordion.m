@@ -56,21 +56,45 @@
         [_selectedSections removeObject:[NSNumber numberWithInteger:selectedSection]];
     }
     
+    
+    // Transaction
+    [CATransaction begin];
+    
+    [CATransaction setCompletionBlock:^{
+        // Done delegates
+        if ([_delegate respondsToSelector:@selector(accordionClosedSection:)]) {
+            if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
+                [_delegate accordionClosedSection:selectedSection];
+            } else if (_allowOnlyOneOpenSection == YES) {
+                for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
+                    [_delegate accordionClosedSection:previouslyOpenedSection.integerValue];
+                }
+            }
+        }
+        
+        if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordionOpenedSection:)]) {
+            [_delegate accordionOpenedSection:selectedSection];
+        }
+    }];
+    
     [_tableView beginUpdates];
     [_tableView endUpdates];
     
-    if ([_delegate respondsToSelector:@selector(accordionClosedSection:)]) {
+    [CATransaction commit];
+    
+    // Doing delegates
+    if ([_delegate respondsToSelector:@selector(accordionClosingSection:)]) {
         if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
-            [_delegate accordionClosedSection:selectedSection];
+            [_delegate accordionClosingSection:selectedSection];
         } else if (_allowOnlyOneOpenSection == YES) {
             for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
-                [_delegate accordionClosedSection:previouslyOpenedSection.integerValue];
+                [_delegate accordionClosingSection:previouslyOpenedSection.integerValue];
             }
         }
     }
     
-    if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordionOpenedSection:)]) {
-        [_delegate accordionOpenedSection:selectedSection];
+    if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordionOpeningSection:)]) {
+        [_delegate accordionOpeningSection:selectedSection];
     }
 }
 

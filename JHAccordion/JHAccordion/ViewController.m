@@ -90,6 +90,14 @@
 
 #pragma mark - JHAccordionDelegate
 
+- (void)accordionOpeningSection:(NSInteger)section {
+    NSLog(@"Opening section - %d", section);
+}
+
+- (void)accordionClosingSection:(NSInteger)section {
+    NSLog(@"Closing section - %d", section);
+}
+
 - (void)accordionOpenedSection:(NSInteger)section {
     NSLog(@"Opened section - %d", section);
 }
