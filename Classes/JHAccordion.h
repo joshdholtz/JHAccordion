@@ -31,9 +31,9 @@
 
 @protocol JHAccordionDelegate <NSObject>
 
-- (void)accordionOpeningSection:(NSInteger)section;
-- (void)accordionClosingSection:(NSInteger)section;
-- (void)accordionOpenedSection:(NSInteger)section;
-- (void)accordionClosedSection:(NSInteger)section;
+- (void)accordion:(JHAccordion*)accordion openingSection:(NSInteger)section;
+- (void)accordion:(JHAccordion*)accordion closingSection:(NSInteger)section;
+- (void)accordion:(JHAccordion*)accordion openedSection:(NSInteger)section;
+- (void)accordion:(JHAccordion*)accordion closedSection:(NSInteger)section;
 
 @end

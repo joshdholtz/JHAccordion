@@ -62,18 +62,18 @@
     
     [CATransaction setCompletionBlock:^{
         // Done delegates
-        if ([_delegate respondsToSelector:@selector(accordionClosedSection:)]) {
+        if ([_delegate respondsToSelector:@selector(accordion:closedSection:)]) {
             if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
-                [_delegate accordionClosedSection:selectedSection];
+                [_delegate accordion:self closedSection:selectedSection];
             } else if (_allowOnlyOneOpenSection == YES) {
                 for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
-                    [_delegate accordionClosedSection:previouslyOpenedSection.integerValue];
+                    [_delegate accordion:self closedSection:previouslyOpenedSection.integerValue];
                 }
             }
         }
         
-        if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordionOpenedSection:)]) {
-            [_delegate accordionOpenedSection:selectedSection];
+        if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
+            [_delegate accordion:self openedSection:selectedSection];
         }
     }];
     
@@ -83,18 +83,18 @@
     [CATransaction commit];
     
     // Doing delegates
-    if ([_delegate respondsToSelector:@selector(accordionClosingSection:)]) {
+    if ([_delegate respondsToSelector:@selector(accordion:closingSection:)]) {
         if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
-            [_delegate accordionClosingSection:selectedSection];
+            [_delegate accordion:self closingSection:selectedSection];
         } else if (_allowOnlyOneOpenSection == YES) {
             for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
-                [_delegate accordionClosingSection:previouslyOpenedSection.integerValue];
+                [_delegate accordion:self closingSection:previouslyOpenedSection.integerValue];
             }
         }
     }
     
-    if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordionOpeningSection:)]) {
-        [_delegate accordionOpeningSection:selectedSection];
+    if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordion:openingSection:)]) {
+        [_delegate accordion:self openingSection:selectedSection];
     }
 }
 
