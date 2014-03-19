@@ -20,20 +20,13 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
     _accordion = [[JHAccordion alloc] initWithTableView:_tblAccordion];
     [_accordion setAllowOnlyOneOpenSection:YES];
     [_accordion setDelegate:self];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - UITableViewDataSource
@@ -50,7 +43,9 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SomeCell" forIndexPath:indexPath];
     
     UILabel *label = (UILabel*)[cell viewWithTag:8675309];
-    [label setText:[NSString stringWithFormat:@"Section %d, Row %d", indexPath.section, indexPath.row]];;
+    label.text = [NSString stringWithFormat:@"Section %ld, Row %ld", (long)indexPath.section, (long)indexPath.row];
+    
+    cell.clipsToBounds = TRUE;
     
     return cell;
 }
@@ -63,7 +58,7 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(tableView.frame), 45.0f)];
-    [view setBackgroundColor:[UIColor redColor]];
+    view.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.75];
     
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 80.0f, 30.f)];
     [button setBackgroundColor:[UIColor lightGrayColor]];
@@ -85,25 +80,25 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return ( [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f);
+    return [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f;
 }
 
 #pragma mark - JHAccordionDelegate
 
-- (void)accordionOpeningSection:(NSInteger)section {
-    NSLog(@"Opening section - %d", section);
+- (void)accordion:(JHAccordion*)accordion openingSection:(NSInteger)section {
+    NSLog(@"Opening section - %ld", (long)section);
 }
 
-- (void)accordionClosingSection:(NSInteger)section {
-    NSLog(@"Closing section - %d", section);
+- (void)accordion:(JHAccordion*)accordion closingSection:(NSInteger)section {
+    NSLog(@"Closing section - %ld", (long)section);
 }
 
-- (void)accordionOpenedSection:(NSInteger)section {
-    NSLog(@"Opened section - %d", section);
+- (void)accordion:(JHAccordion*)accordion openedSection:(NSInteger)section {
+    NSLog(@"Opened section - %ld", (long)section);
 }
 
-- (void)accordionClosedSection:(NSInteger)section {
-    NSLog(@"Closed section - %d", section);
+- (void)accordion:(JHAccordion*)accordion closedSection:(NSInteger)section {
+    NSLog(@"Closed section - %ld", (long)section);
 }
 
 @end
