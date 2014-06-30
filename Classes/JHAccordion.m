@@ -26,6 +26,7 @@
 - (id)init {
     self = [super init];
     if (self) {
+        NSLog(@"init");
         self.selectedSections = [@[] mutableCopy];
     }
     return self;
@@ -123,9 +124,11 @@
             }
         }
         
-        if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
+        if (isPreviouslyOpened == NO) {
             _lastOpenedSection = selectedSection;
-            [_delegate accordion:self openedSection:selectedSection];
+            if ([_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
+                [_delegate accordion:self openedSection:selectedSection];
+            }
         }
         
         if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
