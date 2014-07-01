@@ -15,7 +15,7 @@
 @implementation JHAccordion
 
 - (id)init {
-    self = self = [super init];
+    self = [super init];
     if (self) {
         self.selectedSections = [NSMutableArray array];
     }
