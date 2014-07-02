@@ -8,11 +8,9 @@
 
 #import "JHAccordion.h"
 
-#define kInvalidSection -1
-
 @interface JHAccordion()
 
-@property (nonatomic, strong) NSMutableArray *selectedSections;
+@property (nonatomic, strong) NSMutableArray *openedSections;
 
 @end
 
@@ -27,7 +25,7 @@
     self = [super init];
     if (self) {
         NSLog(@"init");
-        self.selectedSections = [@[] mutableCopy];
+        self.openedSections = [@[] mutableCopy];
     }
     return self;
 }
@@ -92,7 +90,7 @@
 }
 
 - (void)closeSection:(NSInteger)section {
-    _lastOpenedSection = kInvalidSection;
+    _lastOpenedSection = NSNotFound;
     if ([self isSectionOpened:section]) {
         [self toggleSection:section];
     }
@@ -100,16 +98,16 @@
 
 - (void)toggleSection:(NSInteger)selectedSection {
     BOOL isPreviouslyOpened = [self isSectionOpened:selectedSection];
-    NSArray *previouslyOpenedSections = [_selectedSections copy];
+    NSArray *previouslyOpenedSections = [_openedSections copy];
 
     if (isPreviouslyOpened == NO) {
         if (_allowOnlyOneOpenSection == YES) {
-            [_selectedSections removeAllObjects];
+            [_openedSections removeAllObjects];
         }
         
-        [_selectedSections addObject:[NSNumber numberWithInteger:selectedSection]];
+        [_openedSections addObject:[NSNumber numberWithInteger:selectedSection]];
     } else {
-        [_selectedSections removeObject:[NSNumber numberWithInteger:selectedSection]];
+        [_openedSections removeObject:[NSNumber numberWithInteger:selectedSection]];
     }
     
     // Completion block to run delegates
@@ -167,7 +165,7 @@
 }
 
 - (BOOL)isSectionOpened:(NSInteger)section {
-    return [_selectedSections containsObject:[NSNumber numberWithInteger:section]];
+    return [_openedSections containsObject:[NSNumber numberWithInteger:section]];
 }
 
 - (void)onClickSection:(UIView*)sender {
@@ -194,7 +192,7 @@
 }
 
 - (void)slideUpLastOpenedSection {
-    if (_lastOpenedSection >= 0 && [self isSectionOpened:_lastOpenedSection]) {
+    if (_lastOpenedSection != NSNotFound && [self isSectionOpened:_lastOpenedSection]) {
         NSInteger numberOfSections = [_tableView numberOfSections];
         if (numberOfSections > 0) {
             NSInteger numberOfRowsInSection = [_tableView numberOfRowsInSection:_lastOpenedSection];
@@ -203,6 +201,24 @@
             }
         }
     }
+}
+
+- (void)immediatelyResetOpenedSections:(NSArray *)openedSections {
+    _lastOpenedSection = NSNotFound;
+    
+    _openedSections = openedSections.mutableCopy;
+    
+    void (^completionBlock)(void) = ^void() {
+        if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
+            [_delegate accordion:self didUpdateTableView:_tableView];
+        }
+    };
+    
+    [CATransaction begin];
+    [CATransaction setCompletionBlock:completionBlock];
+    [_tableView beginUpdates];
+    [_tableView endUpdates];
+    [CATransaction commit];
 }
 
 #pragma mark - Private
