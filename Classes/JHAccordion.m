@@ -205,20 +205,8 @@
 
 - (void)immediatelyResetOpenedSections:(NSArray *)openedSections {
     _lastOpenedSection = NSNotFound;
-    
     _openedSections = openedSections.mutableCopy;
-    
-    void (^completionBlock)(void) = ^void() {
-        if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
-            [_delegate accordion:self didUpdateTableView:_tableView];
-        }
-    };
-    
-    [CATransaction begin];
-    [CATransaction setCompletionBlock:completionBlock];
-    [_tableView beginUpdates];
-    [_tableView endUpdates];
-    [CATransaction commit];
+    [_tableView reloadData];
 }
 
 #pragma mark - Private
