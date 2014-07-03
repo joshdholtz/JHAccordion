@@ -56,7 +56,9 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SomeCell" forIndexPath:indexPath];
     
     UILabel *label = (UILabel*)[cell viewWithTag:8675309];
-    [label setText:[NSString stringWithFormat:@"Section %d, Row %d", indexPath.section, indexPath.row]];;
+    label.text = [NSString stringWithFormat:@"Section %ld, Row %ld", (long)indexPath.section, (long)indexPath.row];
+    
+    cell.clipsToBounds = TRUE;
     
     return cell;
 }
@@ -91,7 +93,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return ( [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f);
+    return [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f;
 }
 
 #pragma mark - JHAccordionDelegate
@@ -104,20 +106,20 @@
     [_accordion slideUpLastOpenedSection];
 }
 
-- (void)accordionOpeningSection:(NSInteger)section {
-    NSLog(@"Opening section - %d", section);
+- (void)accordion:(JHAccordion*)accordion openingSection:(NSInteger)section {
+    NSLog(@"Opening section - %ld", (long)section);
 }
 
-- (void)accordionClosingSection:(NSInteger)section {
-    NSLog(@"Closing section - %d", section);
+- (void)accordion:(JHAccordion*)accordion closingSection:(NSInteger)section {
+    NSLog(@"Closing section - %ld", (long)section);
 }
 
-- (void)accordionOpenedSection:(NSInteger)section {
-    NSLog(@"Opened section - %d", section);
+- (void)accordion:(JHAccordion*)accordion openedSection:(NSInteger)section {
+    NSLog(@"Opened section - %ld", (long)section);
 }
 
-- (void)accordionClosedSection:(NSInteger)section {
-    NSLog(@"Closed section - %d", section);
+- (void)accordion:(JHAccordion*)accordion closedSection:(NSInteger)section {
+    NSLog(@"Closed section - %ld", (long)section);
 }
 
 @end
