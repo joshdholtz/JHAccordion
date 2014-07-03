@@ -20,8 +20,7 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
@@ -30,8 +29,15 @@
     [_accordion setDelegate:self];
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [_accordion immediatelyResetOpenedSections:@[@0]];
+    });
+}
+
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
@@ -63,13 +69,13 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(tableView.frame), 45.0f)];
-    [view setBackgroundColor:[UIColor redColor]];
+    [view setBackgroundColor:[UIColor lightGrayColor]];
     
-    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 80.0f, 30.f)];
-    [button setBackgroundColor:[UIColor lightGrayColor]];
+    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 310.0f, 30.f)];
+    [button setBackgroundColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.75f]];
     [button.titleLabel setTextColor:[UIColor blackColor]];
     [button.titleLabel setFont:[UIFont systemFontOfSize:14.0f]];
-    [button setTitle:@"A Button" forState:UIControlStateNormal];
+    [button setTitle:@"Section Header Button" forState:UIControlStateNormal];
     
     // Sets up for JHAccordion
     [button setTag:section];
@@ -89,6 +95,14 @@
 }
 
 #pragma mark - JHAccordionDelegate
+
+- (BOOL)accordionShouldAllowOnlyOneOpenSection:(JHAccordion*)accordion {
+    return NO;
+}
+
+- (void)accordion:(JHAccordion*)accordion contentSizeChanged:(CGSize)contentSize {
+    [_accordion slideUpLastOpenedSection];
+}
 
 - (void)accordionOpeningSection:(NSInteger)section {
     NSLog(@"Opening section - %d", section);
