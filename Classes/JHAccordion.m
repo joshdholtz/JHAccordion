@@ -98,43 +98,122 @@
 
 #pragma mark - New Public
 
+- (void)onClickSection:(UIView*)sender {
+    [self toggleSection:sender.tag];
+}
+
+- (BOOL)isSectionOpened:(NSInteger)section {
+    return [_openedSections containsObject:[NSNumber numberWithInteger:section]];
+}
+
+- (void)toggleSection:(NSInteger)section {
+    if ([_openedSections containsObject:[NSNumber numberWithInteger:section]]) {
+        [self closeSection:section];
+    } else {
+        [self openSection:section];
+    }
+}
+
 - (void)openSection:(NSInteger)section {
-    // Queue up operation
-    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
-        
-    }];
-    [_operationQueue addOperation:operation];
+    NSNumber *nsSection = [NSNumber numberWithInteger:section];
     
+    NSArray *sectionsToOpen = ( ![_openedSections containsObject:nsSection] ? @[nsSection] : @[] );
+    
+    NSMutableArray *sectionsToClose = @[].mutableCopy;
+    if (_allowOnlyOneOpenSection) {
+        [sectionsToClose addObjectsFromArray:_openedSections];
+        [sectionsToClose removeObjectsInArray:sectionsToOpen];
+    }
+ 
+    [self openSections:sectionsToOpen closeSections:sectionsToClose];
 }
 
 - (void)closeSection:(NSInteger)section {
-    // Queue up operation
-    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
-        
-    }];
-    [_operationQueue addOperation:operation];
+    NSNumber *nsSection = [NSNumber numberWithInteger:section];
+    
+    [self openSections:nil closeSections:@[nsSection]];
 }
 
 - (void)openSections:(NSArray *)sections {
     if (_allowOnlyOneOpenSection && sections.count > 1) {
+        NSLog(@"Only allowed to open 1 section");
         return;
     }
     
-    // Queue up operation
-    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
-        
-    }];
-    [_operationQueue addOperation:operation];
+    NSMutableArray *sectionsToOpen = sections.mutableCopy;
+    [sectionsToOpen removeObjectsInArray:_openedSections];
+
+    NSMutableArray *sectionsToClose = @[].mutableCopy;
+    if (_allowOnlyOneOpenSection) {
+        [sectionsToClose addObjectsFromArray:_openedSections];
+        [sectionsToClose removeObjectsInArray:sectionsToOpen];
+    }
+    
+    [self openSections:sectionsToOpen closeSections:sectionsToClose];
 }
 
 - (void)closeSections:(NSArray *)sections {
-    if (_allowOnlyOneOpenSection && sections.count > 1) {
-        return;
+    [self openSections:nil closeSections:sections];
+}
+
+- (void)openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose {
+    
+    // Doing delegates
+    if ([_delegate respondsToSelector:@selector(accordion:closingSection:)]) {
+        for (NSNumber *section in sectionsToClose) {
+            [_delegate accordion:self closingSection:section.integerValue];
+        }
+    }
+    if ([_delegate respondsToSelector:@selector(accordion:openingSection:)]) {
+        for (NSNumber *section in sectionsToOpen) {
+            [_delegate accordion:self openingSection:section.integerValue];
+        }
     }
     
     // Queue up operation
     AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
         
+        // Array things
+        [_openedSections addObjectsFromArray:sectionsToOpen];
+        [_openedSections removeObjectsInArray:sectionsToClose];
+        
+        // Completion block to run delegates
+        void (^completionBlock)(void) = ^void() {
+            
+            // Doing delegates
+            if ([_delegate respondsToSelector:@selector(accordion:closedSection:)]) {
+                for (NSNumber *section in sectionsToClose) {
+                    [_delegate accordion:self closedSection:section.integerValue];
+                }
+            }
+            if ([_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
+                for (NSNumber *section in sectionsToOpen) {
+                    [_delegate accordion:self openedSection:section.integerValue];
+                }
+            }
+
+            // More delegates
+            if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
+                [_delegate accordion:self didUpdateTableView:_tableView];
+            }
+            
+            // Finish operation
+            [operation finish];
+        };
+
+        if ([_delegate respondsToSelector:@selector(accordion:willUpdateTableView:)]) {
+            [_delegate accordion:self willUpdateTableView:_tableView];
+        }
+
+        static NSString *lock = @"LOCK";
+        @synchronized(lock) {
+            // Run table animation in a CATransaction to provide a completion block
+            [CATransaction begin];
+            [CATransaction setCompletionBlock:completionBlock];
+            [_tableView beginUpdates];
+            [_tableView endUpdates];
+            [CATransaction commit];
+        }
     }];
     [_operationQueue addOperation:operation];
 }
@@ -222,13 +301,7 @@
 //    }
 //}
 //
-//- (BOOL)isSectionOpened:(NSInteger)section {
-//    return [_openedSections containsObject:[NSNumber numberWithInteger:section]];
-//}
 //
-//- (void)onClickSection:(UIView*)sender {
-//    [self toggleSection:sender.tag];
-//}
 //
 //- (void)slideUpSection:(NSInteger)section inTableView:(UITableView *)tableView {
 //    if (!tableView) { return; }

@@ -19,6 +19,12 @@
 
 - (id)initWithTableView:(UITableView*)tableView;
 
+- (void)onClickSection:(UIView*)sender;
+
+- (BOOL)isSectionOpened:(NSInteger)section;
+
+- (void)toggleSection:(NSInteger)section;
+
 - (void)openSection:(NSInteger)section;
 - (void)closeSection:(NSInteger)section;
 
@@ -28,8 +34,6 @@
 //- (void)openSection:(NSInteger)section;
 //- (void)closeSection:(NSInteger)section;
 //- (void)toggleSection:(NSInteger)section;
-//- (BOOL)isSectionOpened:(NSInteger)section;
-//- (void)onClickSection:(UIView*)sender;
 //- (void)slideUpSection:(NSInteger)section inTableView:(UITableView *)tableView;
 //- (void)slideUpLastOpenedSection;
 //- (void)immediatelyResetOpenedSections:(NSArray *)openedSections;

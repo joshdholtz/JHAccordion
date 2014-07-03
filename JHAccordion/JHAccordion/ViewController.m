@@ -66,7 +66,7 @@
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-//    [_accordion openSection:indexPath.section];
+    [_accordion openSection:indexPath.section];
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
@@ -81,7 +81,7 @@
     
     // Sets up for JHAccordion
     [button setTag:section];
-//    [button addTarget:_accordion action:@selector(onClickSection:) forControlEvents:UIControlEventTouchUpInside];
+    [button addTarget:_accordion action:@selector(onClickSection:) forControlEvents:UIControlEventTouchUpInside];
     
     [view addSubview:button];
     
@@ -92,18 +92,26 @@
     return 45.0f;
 }
 
-//- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-//    return [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f;
-//}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f;
+}
 
 #pragma mark - JHAccordionDelegate
 
 - (BOOL)accordionShouldAllowOnlyOneOpenSection:(JHAccordion*)accordion {
-    return NO;
+    return YES;
 }
 
 - (void)accordion:(JHAccordion*)accordion contentSizeChanged:(CGSize)contentSize {
 //    [_accordion slideUpLastOpenedSection];
+}
+
+- (void)accordion:(JHAccordion *)accordion willUpdateTableView:(UITableView *)tableView {
+    NSLog(@"Will update table view");
+}
+
+- (void)accordion:(JHAccordion *)accordion didUpdateTableView:(UITableView *)tableView {
+    NSLog(@"Did update table view");
 }
 
 - (void)accordion:(JHAccordion*)accordion openingSection:(NSInteger)section {
