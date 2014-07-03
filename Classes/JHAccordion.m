@@ -179,26 +179,7 @@
         
         // Completion block to run delegates
         void (^completionBlock)(void) = ^void() {
-            
-            // Doing delegates
-            if ([_delegate respondsToSelector:@selector(accordion:closedSection:)]) {
-                for (NSNumber *section in sectionsToClose) {
-                    [_delegate accordion:self closedSection:section.integerValue];
-                }
-            }
-            if ([_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
-                for (NSNumber *section in sectionsToOpen) {
-                    [_delegate accordion:self openedSection:section.integerValue];
-                }
-            }
-
-            // More delegates
-            if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
-                [_delegate accordion:self didUpdateTableView:_tableView];
-            }
-            
-            // Finish operation
-            [operation finish];
+            [self finish:operation openSections:sectionsToOpen closeSections:sectionsToClose];
         };
 
         if ([_delegate respondsToSelector:@selector(accordion:willUpdateTableView:)]) {
@@ -218,127 +199,66 @@
     [_operationQueue addOperation:operation];
 }
 
+- (void)finish:(AsyncOperation*)operation openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose {
+    // Doing delegates
+    if ([_delegate respondsToSelector:@selector(accordion:closedSection:)]) {
+        for (NSNumber *section in sectionsToClose) {
+            [_delegate accordion:self closedSection:section.integerValue];
+        }
+    }
+    if ([_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
+        for (NSNumber *section in sectionsToOpen) {
+            [_delegate accordion:self openedSection:section.integerValue];
+        }
+    }
+    
+    // More delegates
+    if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
+        [_delegate accordion:self didUpdateTableView:_tableView];
+    }
+    
+    // Finish operation
+    [operation finish];
+}
+
 //#pragma mark - Old Public
-//
-//- (void)openSection:(NSInteger)section {
-//    if (![self isSectionOpened:section]) {
-//        [self toggleSection:section];
-//    }
-//}
-//
-//- (void)closeSection:(NSInteger)section {
-//    _lastOpenedSection = NSNotFound;
-//    if ([self isSectionOpened:section]) {
-//        [self toggleSection:section];
-//    }
-//}
-//
-//- (void)toggleSection:(NSInteger)selectedSection {
-//    BOOL isPreviouslyOpened = [self isSectionOpened:selectedSection];
-//    NSArray *previouslyOpenedSections = [_openedSections copy];
-//
-//    if (isPreviouslyOpened == NO) {
-//        if (_allowOnlyOneOpenSection == YES) {
-//            [_openedSections removeAllObjects];
-//        }
-//        
-//        [_openedSections addObject:[NSNumber numberWithInteger:selectedSection]];
-//    } else {
-//        [_openedSections removeObject:[NSNumber numberWithInteger:selectedSection]];
-//    }
-//    
-//    // Completion block to run delegates
-//    void (^completionBlock)(void) = ^void() {
-//        if ([_delegate respondsToSelector:@selector(accordion:closedSection:)]) {
-//            if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
-//                [_delegate accordion:self closedSection:selectedSection];
-//            } else if (_allowOnlyOneOpenSection == YES) {
-//                for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
-//                    [_delegate accordion:self closedSection:previouslyOpenedSection.integerValue];
-//                }
-//            }
-//        }
-//        
-//        if (isPreviouslyOpened == NO) {
-//            _lastOpenedSection = selectedSection;
-//            if ([_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
-//                [_delegate accordion:self openedSection:selectedSection];
-//            }
-//        }
-//        
-//        if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
-//            [_delegate accordion:self didUpdateTableView:_tableView];
-//        }
-//    };
-//    
-//    if ([_delegate respondsToSelector:@selector(accordion:willUpdateTableView:)]) {
-//        [_delegate accordion:self willUpdateTableView:_tableView];
-//    }
-//    
-//    static NSString *lock = @"LOCK";
-//    @synchronized(lock) {
-//        // Run table animation in a CATransaction to provide a completion block
-//        [CATransaction begin];
-//        [CATransaction setCompletionBlock:completionBlock];
-//        [_tableView beginUpdates];
-//        [_tableView endUpdates];
-//        [CATransaction commit];
-//    }
-//    
-//    // Doing delegates
-//    if ([_delegate respondsToSelector:@selector(accordion:closingSection:)]) {
-//        if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
-//            [_delegate accordion:self closingSection:selectedSection];
-//        } else if (_allowOnlyOneOpenSection == YES) {
-//            for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
-//                [_delegate accordion:self closingSection:previouslyOpenedSection.integerValue];
-//            }
-//        }
-//    }
-//    
-//    if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordion:openingSection:)]) {
-//        [_delegate accordion:self openingSection:selectedSection];
-//    }
-//}
-//
-//
-//
-//- (void)slideUpSection:(NSInteger)section inTableView:(UITableView *)tableView {
-//    if (!tableView) { return; }
-//    CGRect headerFrame = [tableView rectForHeaderInSection:section];
-//    CGFloat headerBottom = headerFrame.origin.y + CGRectGetHeight(headerFrame);
-//    CGFloat topInset = tableView.contentInset.top;
-//    
-//    // max content offset is the scrolling limit based on the content height and table height adjusting for bottom inset
-//    CGFloat maxContentOffset = MAX(0, tableView.contentSize.height - CGRectGetHeight(tableView.frame) + tableView.contentInset.bottom);
-//    
-//    // the target offset is a fraction of the height of the table view adjusted for the top inset
-//    CGFloat targetOffset = (headerBottom - topInset) - (CGRectGetHeight(tableView.frame) * 0.5);
-//    CGFloat newOffset = MIN(maxContentOffset, targetOffset);
-//    
-//    // only scroll up
-//    if (targetOffset > tableView.contentOffset.y) {
-//        [tableView setContentOffset:CGPointMake(0.0, newOffset) animated:TRUE];
-//    }
-//}
-//
-//- (void)slideUpLastOpenedSection {
-//    if (_lastOpenedSection != NSNotFound && [self isSectionOpened:_lastOpenedSection]) {
-//        NSInteger numberOfSections = [_tableView numberOfSections];
-//        if (numberOfSections > 0) {
-//            NSInteger numberOfRowsInSection = [_tableView numberOfRowsInSection:_lastOpenedSection];
-//            if (numberOfRowsInSection > 0) {
-//                [self slideUpSection:_lastOpenedSection inTableView:_tableView];
-//            }
-//        }
-//    }
-//}
-//
-//- (void)immediatelyResetOpenedSections:(NSArray *)openedSections {
-//    _lastOpenedSection = NSNotFound;
-//    _openedSections = openedSections.mutableCopy;
-//    [_tableView reloadData];
-//}
+
+- (void)slideUpSection:(NSInteger)section inTableView:(UITableView *)tableView {
+    if (!tableView) { return; }
+    CGRect headerFrame = [tableView rectForHeaderInSection:section];
+    CGFloat headerBottom = headerFrame.origin.y + CGRectGetHeight(headerFrame);
+    CGFloat topInset = tableView.contentInset.top;
+    
+    // max content offset is the scrolling limit based on the content height and table height adjusting for bottom inset
+    CGFloat maxContentOffset = MAX(0, tableView.contentSize.height - CGRectGetHeight(tableView.frame) + tableView.contentInset.bottom);
+    
+    // the target offset is a fraction of the height of the table view adjusted for the top inset
+    CGFloat targetOffset = (headerBottom - topInset) - (CGRectGetHeight(tableView.frame) * 0.5);
+    CGFloat newOffset = MIN(maxContentOffset, targetOffset);
+    
+    // only scroll up
+    if (targetOffset > tableView.contentOffset.y) {
+        [tableView setContentOffset:CGPointMake(0.0, newOffset) animated:TRUE];
+    }
+}
+
+- (void)slideUpLastOpenedSection {
+    if (_lastOpenedSection != NSNotFound && [self isSectionOpened:_lastOpenedSection]) {
+        NSInteger numberOfSections = [_tableView numberOfSections];
+        if (numberOfSections > 0) {
+            NSInteger numberOfRowsInSection = [_tableView numberOfRowsInSection:_lastOpenedSection];
+            if (numberOfRowsInSection > 0) {
+                [self slideUpSection:_lastOpenedSection inTableView:_tableView];
+            }
+        }
+    }
+}
+
+- (void)immediatelyResetOpenedSections:(NSArray *)openedSections {
+    _lastOpenedSection = NSNotFound;
+    _openedSections = openedSections.mutableCopy;
+    [_tableView reloadData];
+}
 
 #pragma mark - Private
 

@@ -32,9 +32,9 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-//        [_accordion immediatelyResetOpenedSections:@[@0]];
-//    });
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [_accordion immediatelyResetOpenedSections:@[@0]];
+    });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -99,11 +99,11 @@
 #pragma mark - JHAccordionDelegate
 
 - (BOOL)accordionShouldAllowOnlyOneOpenSection:(JHAccordion*)accordion {
-    return YES;
+    return NO;
 }
 
 - (void)accordion:(JHAccordion*)accordion contentSizeChanged:(CGSize)contentSize {
-//    [_accordion slideUpLastOpenedSection];
+    [_accordion slideUpLastOpenedSection];
 }
 
 - (void)accordion:(JHAccordion *)accordion willUpdateTableView:(UITableView *)tableView {
