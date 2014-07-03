@@ -115,23 +115,32 @@
 }
 
 - (void)openSection:(NSInteger)section {
-    NSNumber *nsSection = [NSNumber numberWithInteger:section];
-    
-    NSArray *sectionsToOpen = ( ![_openedSections containsObject:nsSection] ? @[nsSection] : @[] );
-    
-    NSMutableArray *sectionsToClose = @[].mutableCopy;
-    if (_allowOnlyOneOpenSection) {
-        [sectionsToClose addObjectsFromArray:_openedSections];
-        [sectionsToClose removeObjectsInArray:sectionsToOpen];
-    }
- 
-    [self openSections:sectionsToOpen closeSections:sectionsToClose];
+    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+        
+        NSNumber *nsSection = [NSNumber numberWithInteger:section];
+        
+        NSArray *sectionsToOpen = ( ![_openedSections containsObject:nsSection] ? @[nsSection] : @[] );
+        
+        NSMutableArray *sectionsToClose = @[].mutableCopy;
+        if (_allowOnlyOneOpenSection) {
+            [sectionsToClose addObjectsFromArray:_openedSections];
+            [sectionsToClose removeObjectsInArray:sectionsToOpen];
+        }
+        
+        [self openSections:sectionsToOpen closeSections:sectionsToClose withOperation:operation];
+        
+    }];
+    [_operationQueue addOperation:operation];
 }
 
 - (void)closeSection:(NSInteger)section {
-    NSNumber *nsSection = [NSNumber numberWithInteger:section];
-    
-    [self openSections:nil closeSections:@[nsSection]];
+    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+        
+        NSNumber *nsSection = [NSNumber numberWithInteger:section];
+        [self openSections:nil closeSections:@[nsSection] withOperation:operation];
+        
+    }];
+    [_operationQueue addOperation:operation];
 }
 
 - (void)openSections:(NSArray *)sections {
@@ -140,24 +149,41 @@
         return;
     }
     
-    NSMutableArray *sectionsToOpen = sections.mutableCopy;
-    [sectionsToOpen removeObjectsInArray:_openedSections];
-
-    NSMutableArray *sectionsToClose = @[].mutableCopy;
-    if (_allowOnlyOneOpenSection) {
-        [sectionsToClose addObjectsFromArray:_openedSections];
-        [sectionsToClose removeObjectsInArray:sectionsToOpen];
-    }
-    
-    [self openSections:sectionsToOpen closeSections:sectionsToClose];
+    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+        
+        NSMutableArray *sectionsToOpen = sections.mutableCopy;
+        [sectionsToOpen removeObjectsInArray:_openedSections];
+        
+        NSMutableArray *sectionsToClose = @[].mutableCopy;
+        if (_allowOnlyOneOpenSection) {
+            [sectionsToClose addObjectsFromArray:_openedSections];
+            [sectionsToClose removeObjectsInArray:sectionsToOpen];
+        }
+        
+        [self openSections:sectionsToOpen closeSections:sectionsToClose withOperation:operation];
+        
+    }];
+    [_operationQueue addOperation:operation];
 }
 
 - (void)closeSections:(NSArray *)sections {
-    [self openSections:nil closeSections:sections];
+    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+        
+        [self openSections:nil closeSections:sections withOperation:operation];
+        
+    }];
+    [_operationQueue addOperation:operation];
 }
 
-- (void)openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose {
-    
+//- (void)openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose {
+//    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+//        [self openSections:sectionsToOpen closeSections:sectionsToClose withOperation:operation];
+//    }];
+//    [_operationQueue addOperation:operation];
+//}
+
+- (void)openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose withOperation:(AsyncOperation*)operation {
+
     // Doing delegates
     if ([_delegate respondsToSelector:@selector(accordion:closingSection:)]) {
         for (NSNumber *section in sectionsToClose) {
@@ -170,33 +196,28 @@
         }
     }
     
-    // Queue up operation
-    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
-        
-        // Array things
-        [_openedSections addObjectsFromArray:sectionsToOpen];
-        [_openedSections removeObjectsInArray:sectionsToClose];
-        
-        // Completion block to run delegates
-        void (^completionBlock)(void) = ^void() {
-            [self finish:operation openSections:sectionsToOpen closeSections:sectionsToClose];
-        };
+    // Array things
+    [_openedSections addObjectsFromArray:sectionsToOpen];
+    [_openedSections removeObjectsInArray:sectionsToClose];
+    
+    // Completion block to run delegates
+    void (^completionBlock)(void) = ^void() {
+        [self finish:operation openSections:sectionsToOpen closeSections:sectionsToClose];
+    };
 
-        if ([_delegate respondsToSelector:@selector(accordion:willUpdateTableView:)]) {
-            [_delegate accordion:self willUpdateTableView:_tableView];
-        }
+    if ([_delegate respondsToSelector:@selector(accordion:willUpdateTableView:)]) {
+        [_delegate accordion:self willUpdateTableView:_tableView];
+    }
 
-        static NSString *lock = @"LOCK";
-        @synchronized(lock) {
-            // Run table animation in a CATransaction to provide a completion block
-            [CATransaction begin];
-            [CATransaction setCompletionBlock:completionBlock];
-            [_tableView beginUpdates];
-            [_tableView endUpdates];
-            [CATransaction commit];
-        }
-    }];
-    [_operationQueue addOperation:operation];
+    static NSString *lock = @"LOCK";
+    @synchronized(lock) {
+        // Run table animation in a CATransaction to provide a completion block
+        [CATransaction begin];
+        [CATransaction setCompletionBlock:completionBlock];
+        [_tableView beginUpdates];
+        [_tableView endUpdates];
+        [CATransaction commit];
+    }
 }
 
 - (void)finish:(AsyncOperation*)operation openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose {
