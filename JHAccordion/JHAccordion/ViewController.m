@@ -106,6 +106,14 @@
     [_accordion slideUpLastOpenedSection];
 }
 
+- (void)accordion:(JHAccordion *)accordion willUpdateTableView:(UITableView *)tableView {
+    NSLog(@"Will update table view");
+}
+
+- (void)accordion:(JHAccordion *)accordion didUpdateTableView:(UITableView *)tableView {
+    NSLog(@"Did update table view");
+}
+
 - (void)accordion:(JHAccordion*)accordion openingSection:(NSInteger)section {
     NSLog(@"Opening section - %ld", (long)section);
 }
