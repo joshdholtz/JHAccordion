@@ -21,12 +21,18 @@
 
 - (void)openSection:(NSInteger)section;
 - (void)closeSection:(NSInteger)section;
-- (void)toggleSection:(NSInteger)section;
-- (BOOL)isSectionOpened:(NSInteger)section;
-- (void)onClickSection:(UIView*)sender;
-- (void)slideUpSection:(NSInteger)section inTableView:(UITableView *)tableView;
-- (void)slideUpLastOpenedSection;
-- (void)immediatelyResetOpenedSections:(NSArray *)openedSections;
+
+- (void)openSections:(NSArray*)sections;
+- (void)closeSections:(NSArray*)sections;
+
+//- (void)openSection:(NSInteger)section;
+//- (void)closeSection:(NSInteger)section;
+//- (void)toggleSection:(NSInteger)section;
+//- (BOOL)isSectionOpened:(NSInteger)section;
+//- (void)onClickSection:(UIView*)sender;
+//- (void)slideUpSection:(NSInteger)section inTableView:(UITableView *)tableView;
+//- (void)slideUpLastOpenedSection;
+//- (void)immediatelyResetOpenedSections:(NSArray *)openedSections;
 
 @end
 

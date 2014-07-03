@@ -32,9 +32,9 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [_accordion immediatelyResetOpenedSections:@[@0]];
-    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+//        [_accordion immediatelyResetOpenedSections:@[@0]];
+//    });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -66,7 +66,7 @@
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [_accordion openSection:indexPath.section];
+//    [_accordion openSection:indexPath.section];
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
@@ -81,7 +81,7 @@
     
     // Sets up for JHAccordion
     [button setTag:section];
-    [button addTarget:_accordion action:@selector(onClickSection:) forControlEvents:UIControlEventTouchUpInside];
+//    [button addTarget:_accordion action:@selector(onClickSection:) forControlEvents:UIControlEventTouchUpInside];
     
     [view addSubview:button];
     
@@ -92,9 +92,9 @@
     return 45.0f;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f;
-}
+//- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    return [_accordion isSectionOpened:indexPath.section] ? 44.0f : 0.0f;
+//}
 
 #pragma mark - JHAccordionDelegate
 
@@ -103,7 +103,7 @@
 }
 
 - (void)accordion:(JHAccordion*)accordion contentSizeChanged:(CGSize)contentSize {
-    [_accordion slideUpLastOpenedSection];
+//    [_accordion slideUpLastOpenedSection];
 }
 
 - (void)accordion:(JHAccordion*)accordion openingSection:(NSInteger)section {
