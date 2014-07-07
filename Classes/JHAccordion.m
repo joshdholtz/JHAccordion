@@ -230,6 +230,7 @@
     if ([_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
         for (NSNumber *section in sectionsToOpen) {
             [_delegate accordion:self openedSection:section.integerValue];
+            _lastOpenedSection = [section integerValue];
         }
     }
     

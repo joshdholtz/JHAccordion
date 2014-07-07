@@ -10,6 +10,9 @@
 
 #import "JHAccordion.h"
 
+#define kNumberOfSections 5
+#define kNumberOfRows 5
+
 @interface ViewController ()<UITableViewDataSource, UITableViewDelegate, JHAccordionDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tblAccordion;
@@ -18,7 +21,9 @@
 
 @end
 
-@implementation ViewController
+@implementation ViewController {
+    BOOL _disableSlidingUp;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -33,7 +38,7 @@
     [super viewDidAppear:animated];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [_accordion immediatelyResetOpenedSections:@[@0]];
+        [_accordion immediatelyResetOpenedSections:@[]];
     });
 }
 
@@ -42,21 +47,58 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - User Actions
+
+- (IBAction)oneButtonTapped:(id)sender {
+    _disableSlidingUp = TRUE;
+    
+    // open all sections
+    NSMutableArray *sections = @[].mutableCopy;
+    for (NSUInteger i=0; i<kNumberOfSections; i++) {
+        [sections addObject:[NSNumber numberWithUnsignedInteger:i]];
+    }
+    [_accordion openSections:sections];
+}
+
+- (IBAction)twoButtonTapped:(id)sender {
+    _disableSlidingUp = TRUE;
+    
+    // open odd sections
+    NSMutableArray *sections = @[].mutableCopy;
+    for (NSUInteger i=0; i<kNumberOfSections; i++) {
+        if (i % 2 == 1) {
+            [sections addObject:[NSNumber numberWithUnsignedInteger:i]];
+        }
+    }
+    [_accordion openSections:sections];
+}
+
+- (IBAction)threeButtonTapped:(id)sender {
+    _disableSlidingUp = TRUE;
+    
+    // close all sections
+    NSMutableArray *sections = @[].mutableCopy;
+    for (NSUInteger i=0; i<kNumberOfSections; i++) {
+        [sections addObject:[NSNumber numberWithUnsignedInteger:i]];
+    }
+    [_accordion closeSections:sections];
+}
+
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return kNumberOfSections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 5;
+    return kNumberOfRows;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SomeCell" forIndexPath:indexPath];
     
     UILabel *label = (UILabel*)[cell viewWithTag:8675309];
-    label.text = [NSString stringWithFormat:@"Section %ld, Row %ld", (long)indexPath.section, (long)indexPath.row];
+    label.text = [NSString stringWithFormat:@"Section %ld, Row %ld", (long)indexPath.section+1, (long)indexPath.row+1];
     
     cell.clipsToBounds = TRUE;
     
@@ -70,14 +112,14 @@
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(tableView.frame), 45.0f)];
-    [view setBackgroundColor:[UIColor lightGrayColor]];
     
-    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 310.0f, 30.f)];
-    [button setBackgroundColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.75f]];
-    [button.titleLabel setTextColor:[UIColor blackColor]];
-    [button.titleLabel setFont:[UIFont systemFontOfSize:14.0f]];
-    [button setTitle:@"Section Header Button" forState:UIControlStateNormal];
+    UIViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"SectionHeader"];
+    UIView *view = vc.view;
+    
+    UILabel *label = (UILabel *)[view viewWithTag:1];
+    UIButton *button = (UIButton *)[view viewWithTag:2];
+    
+    label.text = [NSString stringWithFormat:@"Section %lu", section+1];
     
     // Sets up for JHAccordion
     [button setTag:section];
@@ -89,7 +131,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 45.0f;
+    return 50.0f;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -103,7 +145,12 @@
 }
 
 - (void)accordion:(JHAccordion*)accordion contentSizeChanged:(CGSize)contentSize {
-    [_accordion slideUpLastOpenedSection];
+    if (!_disableSlidingUp) {
+        [_accordion slideUpLastOpenedSection];
+    }
+    else {
+        _disableSlidingUp = FALSE;
+    }
 }
 
 - (void)accordion:(JHAccordion *)accordion willUpdateTableView:(UITableView *)tableView {
