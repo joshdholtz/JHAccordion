@@ -48,51 +48,79 @@
                                 <rect key="frame" x="0.0" y="430" width="320" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fHZ-OM-y1k">
-                                        <rect key="frame" x="37" y="10" width="77" height="30"/>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vzg-EL-xP1" userLabel="Container View">
+                                        <rect key="frame" x="13" y="12" width="295" height="27"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" title="Open All">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="oneButtonTapped:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="mqm-Q3-AEK"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nCk-Vd-cGV">
-                                        <rect key="frame" x="122" y="10" width="76" height="30"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fHZ-OM-y1k">
+                                                <rect key="frame" x="0.0" y="0.0" width="68" height="27"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <state key="normal" title="Open All">
+                                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="oneButtonTapped:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="mqm-Q3-AEK"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nCk-Vd-cGV">
+                                                <rect key="frame" x="76" y="0.0" width="68" height="27"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <state key="normal" title="Open Even">
+                                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="twoButtonTapped:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="F87-ol-lyn"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QzH-Aa-SZP">
+                                                <rect key="frame" x="152" y="0.0" width="68" height="27"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <state key="normal" title="Close All">
+                                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="threeButtonTapped:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="m3z-o5-Oa8"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tfc-36-Qhk">
+                                                <rect key="frame" x="228" y="0.0" width="67" height="27"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <state key="normal" title="Open/Close">
+                                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="fourButtonTapped:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="uqt-8C-dpA"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="cQK-tu-mdz"/>
+                                            <constraint firstItem="nCk-Vd-cGV" firstAttribute="leading" secondItem="fHZ-OM-y1k" secondAttribute="trailing" constant="8" symbolic="YES" id="0HX-Cl-oBh"/>
+                                            <constraint firstItem="tfc-36-Qhk" firstAttribute="top" secondItem="vzg-EL-xP1" secondAttribute="top" id="8hz-3B-Rhr"/>
+                                            <constraint firstItem="QzH-Aa-SZP" firstAttribute="leading" secondItem="nCk-Vd-cGV" secondAttribute="trailing" constant="8" symbolic="YES" id="Pfq-lz-CEg"/>
+                                            <constraint firstItem="tfc-36-Qhk" firstAttribute="leading" secondItem="QzH-Aa-SZP" secondAttribute="trailing" constant="8" symbolic="YES" id="Q86-jZ-ihf"/>
+                                            <constraint firstItem="fHZ-OM-y1k" firstAttribute="leading" secondItem="vzg-EL-xP1" secondAttribute="leading" id="S7C-3w-5S6"/>
+                                            <constraint firstAttribute="centerY" secondItem="QzH-Aa-SZP" secondAttribute="centerY" id="S9f-mw-7A5"/>
+                                            <constraint firstAttribute="centerY" secondItem="nCk-Vd-cGV" secondAttribute="centerY" id="Srh-OH-VpF"/>
+                                            <constraint firstAttribute="bottom" secondItem="tfc-36-Qhk" secondAttribute="bottom" id="XQe-De-yL9"/>
+                                            <constraint firstItem="fHZ-OM-y1k" firstAttribute="width" secondItem="QzH-Aa-SZP" secondAttribute="width" id="dRT-s2-EuS"/>
+                                            <constraint firstAttribute="bottom" secondItem="fHZ-OM-y1k" secondAttribute="bottom" id="dxj-cA-K1L"/>
+                                            <constraint firstAttribute="trailing" secondItem="tfc-36-Qhk" secondAttribute="trailing" id="eJO-S1-4TB"/>
+                                            <constraint firstItem="fHZ-OM-y1k" firstAttribute="top" secondItem="vzg-EL-xP1" secondAttribute="top" id="j83-Ah-ztA"/>
+                                            <constraint firstItem="fHZ-OM-y1k" firstAttribute="width" secondItem="nCk-Vd-cGV" secondAttribute="width" id="q3O-cR-E1m"/>
+                                            <constraint firstItem="fHZ-OM-y1k" firstAttribute="width" secondItem="tfc-36-Qhk" secondAttribute="width" id="zxX-sW-9Jf"/>
                                         </constraints>
-                                        <state key="normal" title="Open Even">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="twoButtonTapped:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="F87-ol-lyn"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QzH-Aa-SZP">
-                                        <rect key="frame" x="206" y="10" width="77" height="30"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" title="Close All">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="threeButtonTapped:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="m3z-o5-Oa8"/>
-                                        </connections>
-                                    </button>
+                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="0.5" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="4UF-HI-IrT"/>
-                                    <constraint firstItem="nCk-Vd-cGV" firstAttribute="leading" secondItem="fHZ-OM-y1k" secondAttribute="trailing" constant="8" symbolic="YES" id="FMH-Co-etw"/>
-                                    <constraint firstAttribute="centerY" secondItem="QzH-Aa-SZP" secondAttribute="centerY" id="IBV-C5-ivf"/>
-                                    <constraint firstItem="fHZ-OM-y1k" firstAttribute="width" secondItem="nCk-Vd-cGV" secondAttribute="width" id="Pf0-TQ-lgr"/>
-                                    <constraint firstItem="QzH-Aa-SZP" firstAttribute="leading" secondItem="nCk-Vd-cGV" secondAttribute="trailing" constant="8" symbolic="YES" id="V9j-h5-bMO"/>
-                                    <constraint firstAttribute="centerX" secondItem="nCk-Vd-cGV" secondAttribute="centerX" id="baF-It-oHs"/>
-                                    <constraint firstAttribute="centerY" secondItem="nCk-Vd-cGV" secondAttribute="centerY" id="mmj-vG-bEB"/>
-                                    <constraint firstAttribute="centerY" secondItem="fHZ-OM-y1k" secondAttribute="centerY" id="nDv-bi-QG1"/>
-                                    <constraint firstItem="QzH-Aa-SZP" firstAttribute="width" secondItem="nCk-Vd-cGV" secondAttribute="width" id="sNk-FI-DfU"/>
+                                    <constraint firstAttribute="centerX" secondItem="vzg-EL-xP1" secondAttribute="centerX" id="KAo-JU-wC7"/>
+                                    <constraint firstAttribute="centerY" secondItem="vzg-EL-xP1" secondAttribute="centerY" id="YXp-VN-hB1"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -128,6 +156,50 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="brw-A3-Zlf" userLabel="Background View">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lRF-qM-m1m" userLabel="Top Line View">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="5"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <color key="backgroundColor" white="1" alpha="0.5" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="5" id="B1L-b8-qeK"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DXP-Z6-1cp" userLabel="Top Dark Line View">
+                                        <rect key="frame" x="0.0" y="5" width="320" height="1"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.25" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="1" id="BBJ-4S-shF"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mAa-hT-A7N" userLabel="Bottom Dark Line View">
+                                        <rect key="frame" x="0.0" y="49" width="320" height="1"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.25" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="1" id="9dk-Ub-6OE"/>
+                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="1" id="cVL-Gv-mF0"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="DXP-Z6-1cp" firstAttribute="top" secondItem="lRF-qM-m1m" secondAttribute="bottom" id="4ko-a9-reB"/>
+                                    <constraint firstItem="mAa-hT-A7N" firstAttribute="leading" secondItem="brw-A3-Zlf" secondAttribute="leading" id="CSC-OC-pR7"/>
+                                    <constraint firstAttribute="bottom" secondItem="mAa-hT-A7N" secondAttribute="bottom" id="Qj5-Es-Stt"/>
+                                    <constraint firstItem="DXP-Z6-1cp" firstAttribute="leading" secondItem="brw-A3-Zlf" secondAttribute="leading" id="RpR-qM-D9g"/>
+                                    <constraint firstAttribute="height" constant="50" id="Yum-UZ-Rnk"/>
+                                    <constraint firstAttribute="trailing" secondItem="lRF-qM-m1m" secondAttribute="trailing" id="cva-Ii-6Ch"/>
+                                    <constraint firstAttribute="trailing" secondItem="mAa-hT-A7N" secondAttribute="trailing" id="itP-1Q-DTp"/>
+                                    <constraint firstItem="lRF-qM-m1m" firstAttribute="top" secondItem="brw-A3-Zlf" secondAttribute="top" id="lym-HK-pK2"/>
+                                    <constraint firstAttribute="trailing" secondItem="DXP-Z6-1cp" secondAttribute="trailing" id="rWP-bG-ERi"/>
+                                    <constraint firstItem="lRF-qM-m1m" firstAttribute="leading" secondItem="brw-A3-Zlf" secondAttribute="leading" id="uNA-u3-l7N"/>
+                                </constraints>
+                            </view>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZZ4-TB-N2R">
                                 <rect key="frame" x="20" y="11" width="58" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -148,10 +220,13 @@
                         </subviews>
                         <color key="backgroundColor" red="0.60000002384185791" green="0.60000002384185791" blue="0.60000002384185791" alpha="0.90000000000000002" colorSpace="calibratedRGB"/>
                         <constraints>
+                            <constraint firstItem="brw-A3-Zlf" firstAttribute="leading" secondItem="5nj-cJ-qg0" secondAttribute="leading" id="2dg-e8-v3O"/>
                             <constraint firstAttribute="trailing" secondItem="xCO-7R-S2F" secondAttribute="trailing" id="39d-pA-p3B"/>
+                            <constraint firstAttribute="centerY" secondItem="brw-A3-Zlf" secondAttribute="centerY" id="DgE-cl-gct"/>
                             <constraint firstAttribute="centerY" secondItem="xCO-7R-S2F" secondAttribute="centerY" id="TZH-OM-uFX"/>
                             <constraint firstItem="ZZ4-TB-N2R" firstAttribute="leading" secondItem="5nj-cJ-qg0" secondAttribute="leading" constant="20" symbolic="YES" id="bbG-Ic-hzu"/>
                             <constraint firstAttribute="centerY" secondItem="ZZ4-TB-N2R" secondAttribute="centerY" id="mFP-jA-gyM"/>
+                            <constraint firstAttribute="trailing" secondItem="brw-A3-Zlf" secondAttribute="trailing" id="nwp-IT-59E"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ZZ4-TB-N2R" secondAttribute="trailing" constant="20" symbolic="YES" id="o9H-Zv-h87"/>
                             <constraint firstItem="xCO-7R-S2F" firstAttribute="leading" secondItem="5nj-cJ-qg0" secondAttribute="leading" id="zqD-3r-FYU"/>
                         </constraints>

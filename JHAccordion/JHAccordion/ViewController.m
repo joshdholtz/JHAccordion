@@ -84,6 +84,24 @@
     [_accordion closeSections:sections];
 }
 
+- (IBAction)fourButtonTapped:(id)sender {
+    _disableSlidingUp = TRUE;
+    
+    // close all sections
+    NSMutableArray *open = @[].mutableCopy;
+    NSMutableArray *close = @[].mutableCopy;
+    for (NSUInteger i=0; i<kNumberOfSections; i++) {
+        if (i % 2 == 1) {
+            [close addObject:[NSNumber numberWithUnsignedInteger:i]];
+        }
+        else {
+            [open addObject:[NSNumber numberWithUnsignedInteger:i]];
+        }
+    }
+    [_accordion openSections:open];
+    [_accordion closeSections:close];
+}
+
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -108,7 +126,9 @@
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [_accordion openSection:indexPath.section];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.25 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [tableView deselectRowAtIndexPath:indexPath animated:TRUE];
+    });
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
