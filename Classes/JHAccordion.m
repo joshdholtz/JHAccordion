@@ -8,9 +8,22 @@
 
 #import "JHAccordion.h"
 
+@interface AsyncOperation : NSOperation
+
+@property (nonatomic, assign) BOOL isExecuting;
+@property (nonatomic, assign) BOOL isFinished;
+@property (nonatomic, copy) void (^block)(AsyncOperation* operation);
+
+- (id)initWithBlock:(void (^)(AsyncOperation* operation))block;
+- (void)finish;
+
+@end
+
 @interface JHAccordion()
 
 @property (nonatomic, strong) NSMutableArray *openedSections;
+
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
 
 @end
 
@@ -24,8 +37,10 @@
 - (id)init {
     self = [super init];
     if (self) {
-        NSLog(@"init");
-        self.openedSections = [@[] mutableCopy];
+        _openedSections = [@[] mutableCopy];
+        
+        _operationQueue = [[NSOperationQueue alloc] init];
+        [_operationQueue setMaxConcurrentOperationCount:1];
     }
     return self;
 }
@@ -81,63 +96,113 @@
     [self didChangeValueForKey:@"delegate"];
 }
 
-#pragma mark - Public
+#pragma mark - New Public
+
+- (void)onClickSection:(UIView*)sender {
+    [self toggleSection:sender.tag];
+}
+
+- (BOOL)isSectionOpened:(NSInteger)section {
+    return [_openedSections containsObject:[NSNumber numberWithInteger:section]];
+}
+
+- (void)toggleSection:(NSInteger)section {
+    if ([_openedSections containsObject:[NSNumber numberWithInteger:section]]) {
+        [self closeSection:section];
+    } else {
+        [self openSection:section];
+    }
+}
 
 - (void)openSection:(NSInteger)section {
-    if (![self isSectionOpened:section]) {
-        [self toggleSection:section];
-    }
+    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+        
+        NSNumber *nsSection = [NSNumber numberWithInteger:section];
+        
+        NSArray *sectionsToOpen = ( ![_openedSections containsObject:nsSection] ? @[nsSection] : @[] );
+        
+        NSMutableArray *sectionsToClose = @[].mutableCopy;
+        if (_allowOnlyOneOpenSection) {
+            [sectionsToClose addObjectsFromArray:_openedSections];
+            [sectionsToClose removeObjectsInArray:sectionsToOpen];
+        }
+        
+        [self openSections:sectionsToOpen closeSections:sectionsToClose withOperation:operation];
+        
+    }];
+    [_operationQueue addOperation:operation];
 }
 
 - (void)closeSection:(NSInteger)section {
-    _lastOpenedSection = NSNotFound;
-    if ([self isSectionOpened:section]) {
-        [self toggleSection:section];
-    }
+    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+        
+        NSNumber *nsSection = [NSNumber numberWithInteger:section];
+        [self openSections:nil closeSections:@[nsSection] withOperation:operation];
+        
+    }];
+    [_operationQueue addOperation:operation];
 }
 
-- (void)toggleSection:(NSInteger)selectedSection {
-    BOOL isPreviouslyOpened = [self isSectionOpened:selectedSection];
-    NSArray *previouslyOpenedSections = [_openedSections copy];
-
-    if (isPreviouslyOpened == NO) {
-        if (_allowOnlyOneOpenSection == YES) {
-            [_openedSections removeAllObjects];
+- (void)openSections:(NSArray *)sections {
+    if (_allowOnlyOneOpenSection && sections.count > 1) {
+        NSLog(@"Only allowed to open 1 section");
+        return;
+    }
+    
+    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+        
+        NSMutableArray *sectionsToOpen = sections.mutableCopy;
+        [sectionsToOpen removeObjectsInArray:_openedSections];
+        
+        NSMutableArray *sectionsToClose = @[].mutableCopy;
+        if (_allowOnlyOneOpenSection) {
+            [sectionsToClose addObjectsFromArray:_openedSections];
+            [sectionsToClose removeObjectsInArray:sectionsToOpen];
         }
         
-        [_openedSections addObject:[NSNumber numberWithInteger:selectedSection]];
-    } else {
-        [_openedSections removeObject:[NSNumber numberWithInteger:selectedSection]];
+        [self openSections:sectionsToOpen closeSections:sectionsToClose withOperation:operation];
+        
+    }];
+    [_operationQueue addOperation:operation];
+}
+
+- (void)closeSections:(NSArray *)sections {
+    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
+        
+        [self openSections:nil closeSections:sections withOperation:operation];
+        
+    }];
+    [_operationQueue addOperation:operation];
+}
+
+- (void)openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose withOperation:(AsyncOperation*)operation {
+
+    // Doing delegates
+    if ([_delegate respondsToSelector:@selector(accordion:closingSection:)]) {
+        for (NSNumber *section in sectionsToClose) {
+            [_delegate accordion:self closingSection:section.integerValue];
+        }
     }
+    if ([_delegate respondsToSelector:@selector(accordion:openingSection:)]) {
+        for (NSNumber *section in sectionsToOpen) {
+            [_delegate accordion:self openingSection:section.integerValue];
+            _lastOpenedSection = section.integerValue;
+        }
+    }
+    
+    // Array things
+    [_openedSections addObjectsFromArray:sectionsToOpen];
+    [_openedSections removeObjectsInArray:sectionsToClose];
     
     // Completion block to run delegates
     void (^completionBlock)(void) = ^void() {
-        if ([_delegate respondsToSelector:@selector(accordion:closedSection:)]) {
-            if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
-                [_delegate accordion:self closedSection:selectedSection];
-            } else if (_allowOnlyOneOpenSection == YES) {
-                for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
-                    [_delegate accordion:self closedSection:previouslyOpenedSection.integerValue];
-                }
-            }
-        }
-        
-        if (isPreviouslyOpened == NO) {
-            _lastOpenedSection = selectedSection;
-            if ([_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
-                [_delegate accordion:self openedSection:selectedSection];
-            }
-        }
-        
-        if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
-            [_delegate accordion:self didUpdateTableView:_tableView];
-        }
+        [self finish:operation openSections:sectionsToOpen closeSections:sectionsToClose];
     };
-    
+
     if ([_delegate respondsToSelector:@selector(accordion:willUpdateTableView:)]) {
         [_delegate accordion:self willUpdateTableView:_tableView];
     }
-    
+
     static NSString *lock = @"LOCK";
     @synchronized(lock) {
         // Run table animation in a CATransaction to provide a completion block
@@ -147,30 +212,32 @@
         [_tableView endUpdates];
         [CATransaction commit];
     }
-    
+}
+
+- (void)finish:(AsyncOperation*)operation openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose {
     // Doing delegates
-    if ([_delegate respondsToSelector:@selector(accordion:closingSection:)]) {
-        if (_allowOnlyOneOpenSection == NO && isPreviouslyOpened == YES) {
-            [_delegate accordion:self closingSection:selectedSection];
-        } else if (_allowOnlyOneOpenSection == YES) {
-            for (NSNumber *previouslyOpenedSection in previouslyOpenedSections) {
-                [_delegate accordion:self closingSection:previouslyOpenedSection.integerValue];
-            }
+    if ([_delegate respondsToSelector:@selector(accordion:closedSection:)]) {
+        for (NSNumber *section in sectionsToClose) {
+            [_delegate accordion:self closedSection:section.integerValue];
+        }
+    }
+    if ([_delegate respondsToSelector:@selector(accordion:openedSection:)]) {
+        for (NSNumber *section in sectionsToOpen) {
+            [_delegate accordion:self openedSection:section.integerValue];
+            _lastOpenedSection = [section integerValue];
         }
     }
     
-    if (isPreviouslyOpened == NO && [_delegate respondsToSelector:@selector(accordion:openingSection:)]) {
-        [_delegate accordion:self openingSection:selectedSection];
+    // More delegates
+    if ([_delegate respondsToSelector:@selector(accordion:didUpdateTableView:)]) {
+        [_delegate accordion:self didUpdateTableView:_tableView];
     }
+    
+    // Finish operation
+    [operation finish];
 }
 
-- (BOOL)isSectionOpened:(NSInteger)section {
-    return [_openedSections containsObject:[NSNumber numberWithInteger:section]];
-}
-
-- (void)onClickSection:(UIView*)sender {
-    [self toggleSection:sender.tag];
-}
+//#pragma mark - Old Public
 
 - (void)slideUpSection:(NSInteger)section inTableView:(UITableView *)tableView {
     if (!tableView) { return; }
@@ -220,6 +287,56 @@
             }
         }
     }
+}
+
+@end
+
+#pragma mark - AsyncOperation
+
+@implementation AsyncOperation
+
+- (id)initWithBlock:(void (^)(AsyncOperation* operation))block {
+    self = [super init];
+    if (self == nil)
+        return nil;
+
+    _isExecuting = NO;
+    _isFinished = NO;
+    _block = block;
+    
+    return self;
+}
+
+- (void)start {
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:NO];
+        return;
+    }
+    
+    [self willChangeValueForKey:@"isExecuting"];
+    _isExecuting = YES;
+    [self didChangeValueForKey:@"isExecuting"];
+    
+    if (_block) {
+        _block(self);
+    }
+
+    if (_isFinished) {
+        [self finish];
+    }
+}
+
+
+- (void)finish
+{
+    [self willChangeValueForKey:@"isExecuting"];
+    [self willChangeValueForKey:@"isFinished"];
+    
+    _isExecuting = NO;
+    _isFinished = YES;
+    
+    [self didChangeValueForKey:@"isExecuting"];
+    [self didChangeValueForKey:@"isFinished"];
 }
 
 @end
