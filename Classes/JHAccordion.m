@@ -175,13 +175,6 @@
     [_operationQueue addOperation:operation];
 }
 
-//- (void)openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose {
-//    AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(AsyncOperation *operation) {
-//        [self openSections:sectionsToOpen closeSections:sectionsToClose withOperation:operation];
-//    }];
-//    [_operationQueue addOperation:operation];
-//}
-
 - (void)openSections:(NSArray*)sectionsToOpen closeSections:(NSArray*)sectionsToClose withOperation:(AsyncOperation*)operation {
 
     // Doing delegates
@@ -193,6 +186,7 @@
     if ([_delegate respondsToSelector:@selector(accordion:openingSection:)]) {
         for (NSNumber *section in sectionsToOpen) {
             [_delegate accordion:self openingSection:section.integerValue];
+            _lastOpenedSection = section.integerValue;
         }
     }
     
