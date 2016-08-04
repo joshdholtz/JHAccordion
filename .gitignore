@@ -16,5 +16,8 @@ DerivedData
 .idea/
 *.hmap
 
-#CocoaPods
-Pods
+# CocoaPods
+Pods/
+
+# VSCode
+.vscode/
